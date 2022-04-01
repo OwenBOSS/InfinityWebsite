@@ -1,6 +1,6 @@
 //Props
 var size = 1;
-var step = 500;
+var step = 1;
 
 //Member vars
 var ant;
