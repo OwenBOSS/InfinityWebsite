@@ -1,0 +1,15 @@
+.homeLink {
+  width: 100%;
+  padding-left: 300px;
+  text-align: center;
+}
+
+#canvas {
+  position: absolute;
+  float: left;
+}
+
+#homeLink {
+  position: absolute;
+  background-color: white;
+}
