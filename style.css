@@ -1,3 +1,8 @@
+*{
+  position: relative;
+}
+
+
 .homeLink {
   width: 100%;
   padding-left: 300px;

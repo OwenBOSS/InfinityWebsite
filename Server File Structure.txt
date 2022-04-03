@@ -1,0 +1,4 @@
+The root of the website is the folder "htdocs"
+The root of this repository is the folder "infinity website"
+
+So the contents of "INFINITYWEBSITE" should be placed directly into "htdocs"
