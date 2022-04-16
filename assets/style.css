@@ -14,8 +14,14 @@
   background-color: white;
 }
 
-.centered{
+.centered {
   position: relative;
   width: 100%;
   text-align: center;
+}
+
+.recipe {
+  position: relative;
+  float: left;
+  text-align: justify left;
 }
