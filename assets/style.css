@@ -20,8 +20,8 @@
   text-align: center;
 }
 
-.recipe {
-  position: relative;
-  float: left;
-  text-align: justify left;
+.recipe,
+h1,
+h2 {
+  text-align: left;
 }
