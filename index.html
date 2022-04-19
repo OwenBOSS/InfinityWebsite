@@ -4,13 +4,28 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/assets/style.css" />
+    <link rel="stylesheet" href="../htdocs/assets/style.css" />
+    <link rel="stylesheet" href="../assets/style.css" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <style>
+      h1.centered,
+      h2.centered,
+      p.centered {
+        text-align: center;
+      }
+      ul.centered {
+        text-align: left;
+        list-style: inside;
+        position: relative;
+        display: table;
+        left: 43%;
+      }
+    </style>
     <title>Home</title>
   </head>
   <body>
     <div class="centered">
-      <h1>Welcome!</h1>
+      <h1 style="text-align: center">Welcome!</h1>
       <p>
         Hi! My name is Owen (OwenBOSS) Hodges. You've found my little piece of
         the internet!
@@ -19,14 +34,16 @@
       <h2 style="text-align: center">About</h2>
       <p>Welcome to my website! Poke around and enjoy my projects!</p>
 
-      <h2><a href="/pages/Recipes/index.html">My Cookbook!</a></h2>
+      <h2 style="text-align: center">
+        <a href="/pages/Recipes/index.html">My Cookbook!</a>
+      </h2>
       <p>
         These are all the recipies that I like to cook! Still working on
         formating the data... You have been warned!
       </p>
 
-      <h2>Project List</h2>
-      <ul>
+      <h2 style="text-align: center">Project List</h2>
+      <ul class="centered">
         <li>
           <a href="/pages/Bouncing-Balls/balls.html">Balls!</a>
         </li>
@@ -44,6 +61,9 @@
         </li>
         <li>
           <a href="/pages/LongtonsAnt/index.html">ANTS!</a>
+        </li>
+        <li>
+          <a href="/pages/mazeGenerator/maze.html">MAZE</a>
         </li>
       </ul>
     </div>

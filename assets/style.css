@@ -20,8 +20,18 @@
   text-align: center;
 }
 
-.recipe,
-h1,
-h2 {
+h1.recipe, h2.recipe {
   text-align: left;
+}
+
+h1.centered, h2.centered{
+  text-align: center;
+}
+
+ul.centered{
+  text-align: left;
+  list-style: inside;
+  position: relative;
+  display: table;
+  left: 43%;
 }
