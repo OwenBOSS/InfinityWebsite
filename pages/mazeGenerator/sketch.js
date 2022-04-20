@@ -1,7 +1,7 @@
 //Props
-var columns = 100;
-var rows = 50;
-var cellSize = 10;
+var columns = 200;
+var rows = 100;
+var cellSize = 5;
 var offset = 50;
 
 //Member vars

@@ -54,9 +54,8 @@ class Maze{
         startCell.isStart = true;
         startCell.traveled = true;
         
-        //Iterate
+        //Generate Paths
         var traveledCells = [startCell];
-
         var running = true;
 
         while(running){
@@ -69,18 +68,22 @@ class Maze{
                 var randomCell = potentialCells[randInt]
                 //Add picked cell to traveled cels
                 traveledCells.push(randomCell);
-                try {
-                    randomCell.traveled = true;
-                } catch (error) {
-                    running = false;
-                    console.log(randInt, potentialCells.length, potentialCells);
-                }
+                randomCell.traveled = true;
                 
             }
             else{
                 running = false;
             }
         }
+
+        //pick end point
+        var potentialEndPoints = [];
+        for(let i = 0; i < this.columns; i++){
+            var cell = this.grid[i][this.rows - 1];
+            if(cell.traveled) potentialEndPoints.push(cell);
+        }
+        var randInt = floor(random(0, potentialEndPoints.length));
+        potentialEndPoints[randInt].isEnd = true;
     }
 
     getPotentialCells(traveledCells){
@@ -183,13 +186,20 @@ class Cell{
 
         this.isStart = false;
         this.traveled = false;
+        this.isEnd = false;
+
+        this.wallColor = color(0);
+        this.startColor = color(150, 200, 150);
+        this.endColor = color(255, 100, 100);
+        this.openColor = color(150);
     }
 
     show(){
         noStroke();
-        if(this.isStart) fill(color(150, 200, 150));
-        else if(this.traveled) fill(color(100));
-        else(fill(color(0)));
+        if(this.isStart) fill(this.startColor);
+        else if(this.isEnd) fill(this.endColor);
+        else if(this.traveled) fill(this.openColor);
+        else(fill(this.wallColor));
         rect(this.x * this.size + this.offset, this.y * this.size + this.offset, this.size);
     }
 }
