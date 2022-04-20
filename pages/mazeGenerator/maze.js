@@ -1,11 +1,14 @@
 class Maze{
-    constructor(columns, rows, cellSize, offset){
+    constructor(columns, rows, cellSize, offset, tikRate, mode){
         this.columns = columns;
         this.rows = rows;
         this.cellSize = cellSize;
         this.offset = offset;
+        this.tikRate = tikRate;
+        this.mode = mode;
+
         this.grid = this.makeGrid();
-        this.generatePimMaze();
+        if(mode == "pre") this.generatePimMaze();
     }
 
     makeGrid(){
@@ -22,6 +25,18 @@ class Maze{
         }
 
         return arr;
+    }
+
+    update(){
+        if(mode == "async"){
+            if(asyncPimRunning){    
+                var out = maze.asyncGeneratePimMaze(traveled);
+                traveled = out[1];
+                asyncPimRunning = out[0];
+                if(!asyncPimRunning) maze.asyncEndPim();
+            }
+        }
+        this.show();
     }
 
     show() {
@@ -56,8 +71,8 @@ class Maze{
         
         //Generate Paths
         var traveledCells = [startCell];
-        var running = true;
 
+        var running = true;
         while(running){
             //Get potential cells
             var potentialCells = this.getPotentialCells(traveledCells);
@@ -77,6 +92,62 @@ class Maze{
         }
 
         //pick end point
+        var potentialEndPoints = [];
+        for(let i = 0; i < this.columns; i++){
+            var cell = this.grid[i][this.rows - 1];
+            if(cell.traveled) potentialEndPoints.push(cell);
+        }
+        var randInt = floor(random(0, potentialEndPoints.length));
+        potentialEndPoints[randInt].isEnd = true;
+    }
+
+    asyncStartPim(){
+        //Chose random cell as start
+        var startCell = this.grid[floor(random(0, this.columns + .1))][0];
+        startCell.isStart = true;
+        startCell.traveled = true;
+        
+        //Generate Paths
+        var traveledCells = [startCell];
+
+        return traveledCells;
+    }
+
+    asyncGeneratePimMaze(traveledCells){
+        var out = true;
+
+        //Get potential cells
+        var potentialCells = this.getPotentialCells(traveledCells);
+
+        //Color potential cells
+        for(var i = 0; i < potentialCells.length; i++){
+            potentialCells[i].isPotential = true;
+        }
+                    
+        if(potentialCells.length > 0){
+            //Randomly pick potential cell
+            var randInt = floor(random(0, potentialCells.length));
+            var randomCell = potentialCells[randInt]
+            //Add picked cell to traveled cels
+            traveledCells.push(randomCell);
+            randomCell.traveled = true;
+            
+        }
+        else{
+            out = false;
+        }
+
+        return [out, traveledCells];
+    }
+
+    asyncEndPim(){
+        //Reset potentials
+        for(let i = 0; i < this.columns; i++){
+            for(let j = 0; j < this.rows; j++){
+                this.grid[i][j].isPotential = false;
+            }
+        }
+
         var potentialEndPoints = [];
         for(let i = 0; i < this.columns; i++){
             var cell = this.grid[i][this.rows - 1];
@@ -187,11 +258,13 @@ class Cell{
         this.isStart = false;
         this.traveled = false;
         this.isEnd = false;
+        this.isPotential = false;
 
         this.wallColor = color(0);
         this.startColor = color(80, 255, 80);
         this.endColor = color(255, 80, 80);
         this.openColor = color(150);
+        this.potentialColor = color(255, 255, 80);
     }
 
     show(){
@@ -199,6 +272,7 @@ class Cell{
         if(this.isStart) fill(this.startColor);
         else if(this.isEnd) fill(this.endColor);
         else if(this.traveled) fill(this.openColor);
+        else if(this.isPotential) fill(this.potentialColor);
         else(fill(this.wallColor));
         rect(this.x * this.size + this.offset, this.y * this.size + this.offset, this.size);
     }
