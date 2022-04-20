@@ -9,6 +9,13 @@ class Maze{
 
         this.grid = this.makeGrid();
         if(mode == "pre") this.generatePimMaze();
+
+        /*Should contain:
+         - potential cells
+         - cells that just became paths
+         */
+        this.updatedCells = [];
+        this.traveledCells = [];
     }
 
     makeGrid(){
@@ -28,15 +35,27 @@ class Maze{
     }
 
     update(){
-        if(mode == "async"){
-            if(asyncPimRunning){    
-                var out = maze.asyncGeneratePimMaze(traveled);
-                traveled = out[1];
-                asyncPimRunning = out[0];
-                if(!asyncPimRunning) maze.asyncEndPim();
-            }
+        switch (mode) {
+            case "async":
+                this.updatedCells.length = 0;
+                if(asyncPimRunning){    
+                    var out = maze.asyncGeneratePimMaze(traveled);
+                    traveled = out[1];
+                    asyncPimRunning = out[0];
+
+                    if(!asyncPimRunning) maze.asyncEndPim();
+
+                    this.show();
+                }
+                break;
+            case  "solve-player":
+
+                break;
+        
+            case "pre":
+                this.show();
+                break;
         }
-        this.show();
     }
 
     show() {
@@ -51,6 +70,19 @@ class Maze{
                 stroke(0);
                 this.grid[i][j].show();
             }
+        }
+    }
+
+    targetedShow(){
+        var bgColor = this.grid[0][0].wallColor;
+        background(bgColor);
+
+        for(let i = 0; i < this.traveledCells.length; i++){
+            this.traveledCells[i].show();
+        }
+
+        for (let i = 0; i < this.updatedCells.length; i++) {
+            this.updatedCells[i].show();
         }
     }
 
@@ -70,19 +102,19 @@ class Maze{
         startCell.traveled = true;
         
         //Generate Paths
-        var traveledCells = [startCell];
+        this.traveledCells = [startCell];
 
         var running = true;
         while(running){
             //Get potential cells
-            var potentialCells = this.getPotentialCells(traveledCells);
+            var potentialCells = this.getPotentialCells(this.traveledCells);
             
             if(potentialCells.length > 0){
                 //Randomly pick potential cell
                 var randInt = floor(random(0, potentialCells.length));
                 var randomCell = potentialCells[randInt]
                 //Add picked cell to traveled cels
-                traveledCells.push(randomCell);
+                this.traveledCells.push(randomCell);
                 randomCell.traveled = true;
                 
             }
@@ -92,13 +124,21 @@ class Maze{
         }
 
         //pick end point
+        this.generateEndPoint();
+    }
+
+    generateEndPoint() {
         var potentialEndPoints = [];
-        for(let i = 0; i < this.columns; i++){
+        for (let i = 0; i < this.columns; i++) {
             var cell = this.grid[i][this.rows - 1];
-            if(cell.traveled) potentialEndPoints.push(cell);
+            if (cell.traveled)
+                potentialEndPoints.push(cell);
         }
         var randInt = floor(random(0, potentialEndPoints.length));
         potentialEndPoints[randInt].isEnd = true;
+
+        //Set mode to 
+        this.mode = "generated";
     }
 
     asyncStartPim(){
@@ -120,15 +160,15 @@ class Maze{
         var potentialCells = this.getPotentialCells(traveledCells);
 
         //Color potential cells
-        // Need to uncolor them..
-        //Reset potentials
         for(let i = 0; i < this.columns; i++){
             for(let j = 0; j < this.rows; j++){
                 this.grid[i][j].isPotential = false;
             }
         }
         for(var i = 0; i < potentialCells.length; i++){
-            potentialCells[i].isPotential = true;
+            var cell = potentialCells[i];
+            cell.isPotential = true;
+            this.updatedCells.push(cell);
         }
                     
         if(potentialCells.length > 0){
@@ -138,7 +178,7 @@ class Maze{
             //Add picked cell to traveled cels
             traveledCells.push(randomCell);
             randomCell.traveled = true;
-            
+            this.updatedCells.push(randomCell);
         }
         else{
             out = false;
@@ -154,14 +194,7 @@ class Maze{
                 this.grid[i][j].isPotential = false;
             }
         }
-
-        var potentialEndPoints = [];
-        for(let i = 0; i < this.columns; i++){
-            var cell = this.grid[i][this.rows - 1];
-            if(cell.traveled) potentialEndPoints.push(cell);
-        }
-        var randInt = floor(random(0, potentialEndPoints.length));
-        potentialEndPoints[randInt].isEnd = true;
+        this.generateEndPoint();
     }
 
     getPotentialCells(traveledCells){

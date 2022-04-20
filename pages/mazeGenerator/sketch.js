@@ -4,7 +4,7 @@
 var columns = 100;
 var rows = 50;
 var cellSize = 10;
-var offset = 10;
+var offset = 0;
 var tikRate = 0;
 var mode = "async" // 1) async 2) pre
 //add props for colors!
@@ -32,6 +32,5 @@ function setup(){
 }
 
 function draw(){
-    background(0);
     maze.update();
 }
