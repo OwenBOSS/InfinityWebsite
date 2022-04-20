@@ -189,8 +189,8 @@ class Cell{
         this.isEnd = false;
 
         this.wallColor = color(0);
-        this.startColor = color(150, 200, 150);
-        this.endColor = color(255, 100, 100);
+        this.startColor = color(80, 255, 80);
+        this.endColor = color(255, 80, 80);
         this.openColor = color(150);
     }
 
