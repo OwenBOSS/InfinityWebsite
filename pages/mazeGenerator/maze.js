@@ -49,7 +49,7 @@ class Maze{
                 }
                 break;
             case  "solve-player":
-
+                this.show();
                 break;
         
             case "pre":
@@ -138,7 +138,7 @@ class Maze{
         potentialEndPoints[randInt].isEnd = true;
 
         //Set mode to 
-        this.mode = "generated";
+        this.mode = "solve-player";
     }
 
     asyncStartPim(){
@@ -195,6 +195,7 @@ class Maze{
             }
         }
         this.generateEndPoint();
+        this.mode = "solve-player";
     }
 
     getPotentialCells(traveledCells){
