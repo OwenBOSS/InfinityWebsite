@@ -120,6 +120,13 @@ class Maze{
         var potentialCells = this.getPotentialCells(traveledCells);
 
         //Color potential cells
+        // Need to uncolor them..
+        //Reset potentials
+        for(let i = 0; i < this.columns; i++){
+            for(let j = 0; j < this.rows; j++){
+                this.grid[i][j].isPotential = false;
+            }
+        }
         for(var i = 0; i < potentialCells.length; i++){
             potentialCells[i].isPotential = true;
         }
