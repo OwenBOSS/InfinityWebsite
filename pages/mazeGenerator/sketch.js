@@ -5,7 +5,7 @@ var columns = 100;
 var rows = 50;
 var cellSize = 10;
 var offset = 0;
-var tikRate = 0;
+var steps = 100;
 var mode = "async" // 1) async 2) pre
 //add props for colors!
 
@@ -27,7 +27,7 @@ function setup(){
     rows = floor((canvasHeight - offset)/(cellSize));
     columns = floor((canvasWidth - offset)/(cellSize));
     
-    maze = new Maze(columns, rows, cellSize, offset, tikRate, mode);
+    maze = new Maze(columns, rows, cellSize, offset, steps, mode);
     traveled = maze.asyncStartPim();
 }
 

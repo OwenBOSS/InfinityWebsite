@@ -1,14 +1,11 @@
-class Maze{
-    constructor(columns, rows, cellSize, offset, tikRate, mode){
+class Maze {
+    constructor(columns, rows, cellSize, offset, steps, mode) {
         this.columns = columns;
         this.rows = rows;
         this.cellSize = cellSize;
         this.offset = offset;
-        this.tikRate = tikRate;
+        this.steps = steps;
         this.mode = mode;
-
-        this.grid = this.makeGrid();
-        if(mode == "pre") this.generatePimMaze();
 
         /*Should contain:
          - potential cells
@@ -16,17 +13,22 @@ class Maze{
          */
         this.updatedCells = [];
         this.traveledCells = [];
+
+        this.grid = this.makeGrid();
+        if (mode == "pre") this.generatePimMaze();
+
+
     }
 
-    makeGrid(){
+    makeGrid() {
         var arr = new Array(this.columns);
 
         for (let j = 0; j < this.columns; j++) {
-            arr[j] = new Array(this.rows);          
+            arr[j] = new Array(this.rows);
         }
 
-        for(let i = 0; i < this.columns; i++){
-            for(let j = 0; j < this.rows; j++){
+        for (let i = 0; i < this.columns; i++) {
+            for (let j = 0; j < this.rows; j++) {
                 arr[i][j] = new Cell(i, j, this.cellSize, this.offset);
             }
         }
@@ -34,24 +36,28 @@ class Maze{
         return arr;
     }
 
-    update(){
+    update() {
         switch (mode) {
             case "async":
-                this.updatedCells.length = 0;
-                if(asyncPimRunning){    
-                    var out = maze.asyncGeneratePimMaze(traveled);
-                    traveled = out[1];
-                    asyncPimRunning = out[0];
+                if (asyncPimRunning) {
+                    //Do the calculations for n steps
+                    for (let i = 0; i < this.steps; i++) {
+                        var out = maze.asyncGeneratePimMaze(traveled);
+                        traveled = out[1];
+                        asyncPimRunning = out[0];
+                    }
+                    //Should only be ran once
+                    if (!asyncPimRunning) maze.asyncEndPim();
 
-                    if(!asyncPimRunning) maze.asyncEndPim();
-
-                    this.show();
+                    //Only display once every n steps
+                    this.targetedShow();
+                    this.updatedCells.length = 0;
                 }
                 break;
-            case  "solve-player":
+            case "solve-player":
                 this.show();
                 break;
-        
+
             case "pre":
                 this.show();
                 break;
@@ -59,12 +65,11 @@ class Maze{
     }
 
     show() {
-        for(let i = 0; i < this.columns; i++){
+        for (let i = 0; i < this.columns; i++) {
             for (let j = 0; j < rows; j++) {
-                if(this.isOver(i, j)){
+                if (this.isOver(i, j)) {
                     fill(200);
-                }
-                else{
+                } else {
                     fill(255);
                 }
                 stroke(0);
@@ -73,52 +78,53 @@ class Maze{
         }
     }
 
-    targetedShow(){
+    targetedShow() {
         var bgColor = this.grid[0][0].wallColor;
         background(bgColor);
 
-        for(let i = 0; i < this.traveledCells.length; i++){
-            this.traveledCells[i].show();
-        }
+
 
         for (let i = 0; i < this.updatedCells.length; i++) {
             this.updatedCells[i].show();
         }
+
+        for (let i = 0; i < this.traveledCells.length; i++) {
+            this.traveledCells[i].show();
+        }
     }
 
-    isOver(i, j){
+    isOver(i, j) {
         var out = false;
         var cell = this.grid[i][j];
 
-        if(mouseX > cell.leftBound && mouseX < cell.rightBound && mouseY > cell.topBound && mouseY < cell.bottomBound) out = true;
+        if (mouseX > cell.leftBound && mouseX < cell.rightBound && mouseY > cell.topBound && mouseY < cell.bottomBound) out = true;
 
         return out;
     }
 
-    generatePimMaze(){
+    generatePimMaze() {
         //Chose random cell as start
         var startCell = this.grid[floor(random(0, this.columns + .1))][0];
         startCell.isStart = true;
         startCell.traveled = true;
-        
+
         //Generate Paths
         this.traveledCells = [startCell];
 
         var running = true;
-        while(running){
+        while (running) {
             //Get potential cells
-            var potentialCells = this.getPotentialCells(this.traveledCells);
-            
-            if(potentialCells.length > 0){
+            var potentialCells = this.getPotentialCells();
+
+            if (potentialCells.length > 0) {
                 //Randomly pick potential cell
                 var randInt = floor(random(0, potentialCells.length));
                 var randomCell = potentialCells[randInt]
                 //Add picked cell to traveled cels
                 this.traveledCells.push(randomCell);
                 randomCell.traveled = true;
-                
-            }
-            else{
+
+            } else {
                 running = false;
             }
         }
@@ -141,56 +147,53 @@ class Maze{
         this.mode = "solve-player";
     }
 
-    asyncStartPim(){
+    asyncStartPim() {
         //Chose random cell as start
         var startCell = this.grid[floor(random(0, this.columns + .1))][0];
         startCell.isStart = true;
         startCell.traveled = true;
-        
-        //Generate Paths
-        var traveledCells = [startCell];
 
-        return traveledCells;
+        //Generate Paths
+        this.traveledCells = [startCell];
     }
 
-    asyncGeneratePimMaze(traveledCells){
+    asyncGeneratePimMaze(traveledCells) {
         var out = true;
 
         //Get potential cells
         var potentialCells = this.getPotentialCells(traveledCells);
 
         //Color potential cells
-        for(let i = 0; i < this.columns; i++){
-            for(let j = 0; j < this.rows; j++){
+        for (let i = 0; i < this.columns; i++) {
+            for (let j = 0; j < this.rows; j++) {
                 this.grid[i][j].isPotential = false;
             }
         }
-        for(var i = 0; i < potentialCells.length; i++){
+        for (var i = 0; i < potentialCells.length; i++) {
             var cell = potentialCells[i];
             cell.isPotential = true;
             this.updatedCells.push(cell);
         }
-                    
-        if(potentialCells.length > 0){
+
+        if (potentialCells.length > 0) {
             //Randomly pick potential cell
             var randInt = floor(random(0, potentialCells.length));
             var randomCell = potentialCells[randInt]
             //Add picked cell to traveled cels
-            traveledCells.push(randomCell);
+            this.traveledCells.push(randomCell);
             randomCell.traveled = true;
             this.updatedCells.push(randomCell);
-        }
-        else{
+        } else {
             out = false;
         }
 
         return [out, traveledCells];
     }
 
-    asyncEndPim(){
+    asyncEndPim() {
         //Reset potentials
-        for(let i = 0; i < this.columns; i++){
-            for(let j = 0; j < this.rows; j++){
+        for (let i = 0; i < this.columns; i++) {
+            for (let j = 0; j < this.rows; j++) {
                 this.grid[i][j].isPotential = false;
             }
         }
@@ -198,22 +201,21 @@ class Maze{
         this.mode = "solve-player";
     }
 
-    getPotentialCells(traveledCells){
+    getPotentialCells() {
         var cells = [];
         var neighboors = [];
 
-        for(let i = 0; i < traveledCells.length; i++)
-        {
+        for (let i = 0; i < this.traveledCells.length; i++) {
             //Neighboors of current cell
-            var moreNeighboors = this.getNeighboors(traveledCells[i]);
-            for(let i = 0; i < moreNeighboors.length; i++){
+            var moreNeighboors = this.getNeighboors(this.traveledCells[i]);
+            for (let i = 0; i < moreNeighboors.length; i++) {
                 //Only reuturn untraveled cells
-                if(!moreNeighboors[i].traveled) neighboors.push(moreNeighboors[i]);
+                if (!moreNeighboors[i].traveled) neighboors.push(moreNeighboors[i]);
             }
         }
 
         //Remove neighboors that have more than two traveled neighboors
-        for(let i = 0; i < neighboors.length; i++){
+        for (let i = 0; i < neighboors.length; i++) {
             //Look at neighboor cell alias "x".
             var cell = neighboors[i];
 
@@ -222,59 +224,59 @@ class Maze{
 
             //if "x" has 1 traveled neighboor add to cells list
             var numberOfTraveledNeighboors = 0;
-            for(let i = 0; i < xNeighboors.length; i++){
-                if(xNeighboors[i].traveled) numberOfTraveledNeighboors++;
+            for (let i = 0; i < xNeighboors.length; i++) {
+                if (xNeighboors[i].traveled) numberOfTraveledNeighboors++;
             }
-            if(numberOfTraveledNeighboors == 1) cells.push(cell);
+            if (numberOfTraveledNeighboors == 1) cells.push(cell);
         }
 
         return cells;
     }
 
-    getNeighboors(currentCell){
+    getNeighboors(currentCell) {
         var neighboors = [];
         //If we aren't an edge cell...
-        if(currentCell.x != 0 && currentCell.x != this.columns - 1 && currentCell.y != 0 && currentCell.y != this.rows - 1){
+        if (currentCell.x != 0 && currentCell.x != this.columns - 1 && currentCell.y != 0 && currentCell.y != this.rows - 1) {
             neighboors.push(
                 this.grid[currentCell.x][currentCell.y - 1], this.grid[currentCell.x + 1][currentCell.y], //hoizontal
-                this.grid[currentCell.x][currentCell.y + 1], this.grid[currentCell.x - 1][currentCell.y]  //vertical
+                this.grid[currentCell.x][currentCell.y + 1], this.grid[currentCell.x - 1][currentCell.y] //vertical
             )
         }
 
         //Corner checks...
-        else if(currentCell.x == 0 && currentCell.y == 0) neighboors.push(this.grid[currentCell.x + 1][currentCell.y + 1]);
-        else if(currentCell.x == this.columns - 1 && currentCell.y == 0) neighboors.push(this.grid[currentCell.x - 1][currentCell.y + 1]);
-        else if(currentCell.x == this.columns - 1 && currentCell.y == this.rows - 1) neighboors.push(this.grid[currentCell.x - 1][currentCell.y - 1]);
-        else if(currentCell.x == 0 && currentCell.y == this.rows - 1) neighboors.push(this.grid[currentCell.x + 1][currentCell.y - 1]);
+        else if (currentCell.x == 0 && currentCell.y == 0) neighboors.push(this.grid[currentCell.x + 1][currentCell.y + 1]);
+        else if (currentCell.x == this.columns - 1 && currentCell.y == 0) neighboors.push(this.grid[currentCell.x - 1][currentCell.y + 1]);
+        else if (currentCell.x == this.columns - 1 && currentCell.y == this.rows - 1) neighboors.push(this.grid[currentCell.x - 1][currentCell.y - 1]);
+        else if (currentCell.x == 0 && currentCell.y == this.rows - 1) neighboors.push(this.grid[currentCell.x + 1][currentCell.y - 1]);
 
         //Top edge check
-        else if(currentCell.y == 0) {
-                neighboors.push(
-                    this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x + 1][currentCell.y], 
-                    this.grid[currentCell.x][currentCell.y + 1]
-                );
+        else if (currentCell.y == 0) {
+            neighboors.push(
+                this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x + 1][currentCell.y],
+                this.grid[currentCell.x][currentCell.y + 1]
+            );
         }
 
         //Right edge check
-        else if(currentCell.x == this.columns - 1) {
+        else if (currentCell.x == this.columns - 1) {
             neighboors.push(
-                this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x][currentCell.y - 1], 
+                this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x][currentCell.y - 1],
                 this.grid[currentCell.x][currentCell.y + 1]
             );
         }
 
         //Bottom edge check
-        else if(currentCell.y == this.rows - 1) {
+        else if (currentCell.y == this.rows - 1) {
             neighboors.push(
-                this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x][currentCell.y - 1], 
+                this.grid[currentCell.x - 1][currentCell.y], this.grid[currentCell.x][currentCell.y - 1],
                 this.grid[currentCell.x + 1][currentCell.y]
             );
         }
 
         //Left edge check
-        else if(currentCell.x == this.columns - 1) {
+        else if (currentCell.x == this.columns - 1) {
             neighboors.push(
-                this.grid[currentCell.x][currentCell.y - 1], this.grid[currentCell.x + 1][currentCell.y], 
+                this.grid[currentCell.x][currentCell.y - 1], this.grid[currentCell.x + 1][currentCell.y],
                 this.grid[currentCell.x][currentCell.y + 1]
             );
         }
@@ -283,13 +285,13 @@ class Maze{
     }
 }
 
-class Cell{
-    constructor(x, y, size, offset){
+class Cell {
+    constructor(x, y, size, offset) {
         this.x = x;
         this.y = y;
         this.size = size;
         this.offset = offset;
-        
+
         //Bounds depend on rect mode!
         this.leftBound = offset + x * size;
         this.rightBound = offset + x * size + size;
@@ -308,12 +310,12 @@ class Cell{
         this.potentialColor = color(255, 255, 80);
     }
 
-    show(){
+    show() {
         noStroke();
-        if(this.isStart) fill(this.startColor);
-        else if(this.isEnd) fill(this.endColor);
-        else if(this.traveled) fill(this.openColor);
-        else if(this.isPotential) fill(this.potentialColor);
+        if (this.isStart) fill(this.startColor);
+        else if (this.isEnd) fill(this.endColor);
+        else if (this.traveled) fill(this.openColor);
+        else if (this.isPotential) fill(this.potentialColor);
         else(fill(this.wallColor));
         rect(this.x * this.size + this.offset, this.y * this.size + this.offset, this.size);
     }
