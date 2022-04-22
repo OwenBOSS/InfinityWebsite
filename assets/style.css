@@ -29,3 +29,20 @@ ul.centered{
   display: table;
   left: 43%;
 }
+
+body.homepage{
+  margin: 0px;
+  padding: 0%;
+  background-color: #abb8c3;
+}
+
+img.homepage{
+  max-width: 100vw;
+  width: auto;
+  margin: 0px;
+  padding-left: 0%;
+}
+
+p.homepage{
+  width: 50%;
+}
