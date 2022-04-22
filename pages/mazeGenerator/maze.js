@@ -13,6 +13,11 @@ class Maze {
          */
         this.updatedCells = [];
         this.traveledCells = [];
+        this.path = [];
+        this.startCell;
+        this.userInput = [];
+        this.potentialPaths = [];
+        this.endCell;
 
         this.asyncPimRunning = false;
 
@@ -50,12 +55,33 @@ class Maze {
                 this.targetedShow();
                 this.updatedCells.length = 0;
                 break;
+
             case "solve-player":
+                //Get cells the player could place on
+                this.getPotentialPaths();
+                //If input is over one of potential cells
+                //Add cell to path list and set cell state to path
+                var cell = this.isOver(this.userInput[0], this.userInput[1]);
+                if(cell != null && cell != this.endCell) {
+                    cell.isPath = true;
+                    this.path.push(cell);
+                    cell.isPotential = false;
+                    this.startCell = cell;
+                }
+                else if(cell == this.endCell){
+                    this.mode = "game-won";
+                }
+
                 this.show();
                 break;
 
             case "pre":
                 this.show();
+                break;
+            
+            case "game-won":
+                fill(color(80, 255, 80));
+                rect(0,0, this.columns * this.cellSize, this.rows * this.cellSize);
                 break;
         }
     }
@@ -64,10 +90,6 @@ class Maze {
         for (let i = 0; i < this.columns; i++) {
             for (let j = 0; j < rows; j++) {
                 this.grid[i][j].show();
-                fill(color(80, 180, 255));
-
-                rectMode(CENTER);
-                rect(mouseX, mouseY, 10);
             }
         }
     }
@@ -87,18 +109,36 @@ class Maze {
         }
     }
 
-    isOver(i, j) {
-        var out = false;
-        var cell = this.grid[i][j];
+    getUserInput() {
+        this.userInput = [mouseX, mouseY];
+    }
 
-        if (mouseX > cell.leftBound && mouseX < cell.rightBound && mouseY > cell.topBound && mouseY < cell.bottomBound) out = true;
+    getPotentialPaths() {
+        this.resetPotentials();
+        this.potentialPaths.length = 0;
+        var neighboors = this.getNeighboors(this.startCell);
+        for (let i = 0; i < neighboors.length; i++) {
+            var cell = neighboors[i];
+            if (cell.traveled && !cell.isPath) {
+                cell.isPotential = true;
+                this.potentialPaths.push(cell);
+            }
+        }
+    }
 
-        return out;
+    isOver(x, y) {
+        for (let i = 0; i < this.potentialPaths.length; i++) {
+            var cell = this.potentialPaths[i];
+            if (x > cell.leftBound && x < cell.rightBound && y > cell.topBound && y < cell.bottomBound) {
+                return cell;
+            }
+        }
     }
 
     generatePimMaze() {
         //Chose random cell as start
         var startCell = this.grid[floor(random(0, this.columns + .1))][0];
+        this.startCell = startCell; //Begging for refactor...
         startCell.isStart = true;
         startCell.traveled = true;
 
@@ -136,7 +176,10 @@ class Maze {
         }
         var randInt = floor(random(0, potentialEndPoints.length));
         try {
-            potentialEndPoints[randInt].isEnd = true;
+            var cell = potentialEndPoints[randInt];
+            cell.isEnd = true;
+            this.endCell = cell;
+            
         } catch (error) {
             console.log(potentialEndPoints, cell);
         }
@@ -155,6 +198,7 @@ class Maze {
         var startCell = this.grid[floor(random(0, this.columns + .1))][0];
         startCell.isStart = true;
         startCell.traveled = true;
+        this.startCell = startCell; //Begging for refactor...
 
         //Generate Paths
         this.traveledCells = [startCell];
@@ -199,13 +243,17 @@ class Maze {
     }
 
     asyncEndPim() {
+        this.resetPotentials();
+        this.generateEndPoint();
+    }
+
+    resetPotentials(){
         //Reset potentials
         for (let i = 0; i < this.columns; i++) {
             for (let j = 0; j < this.rows; j++) {
                 this.grid[i][j].isPotential = false;
             }
         }
-        this.generateEndPoint();
     }
 
     getPotentialCells() {
@@ -309,21 +357,24 @@ class Cell {
         this.traveled = false;
         this.isEnd = false;
         this.isPotential = false;
+        this.isPath = false;
 
         this.wallColor = color(0);
         this.startColor = color(80, 255, 80);
         this.endColor = color(255, 80, 80);
         this.openColor = color(150);
         this.potentialColor = color(255, 255, 80);
+        this.pathColor = color(80, 180, 255);
     }
 
     show() {
         noStroke();
         rectMode(CORNER);
         if (this.isStart) fill(this.startColor);
-        else if (this.isEnd) fill(this.endColor);
-        else if (this.traveled) fill(this.openColor);
         else if (this.isPotential) fill(this.potentialColor);
+        else if (this.isEnd) fill(this.endColor);
+        else if (this.isPath) fill(this.pathColor);
+        else if (this.traveled) fill(this.openColor);
         else(fill(this.wallColor));
         rect(this.x * this.size + this.offset, this.y * this.size + this.offset, this.size);
     }

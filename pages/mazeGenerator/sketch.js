@@ -3,7 +3,7 @@
 //Props
 var columns = 100;
 var rows = 50;
-var cellSize = 10;
+var cellSize = 30;
 var offset = 0;
 var steps = 100;
 var mode = "async" // 1) async 2) pre
@@ -33,4 +33,8 @@ function setup(){
 
 function draw(){
     maze.update();
+}
+
+function mousePressed(){
+    maze.getUserInput();
 }
