@@ -14,9 +14,11 @@ class Maze {
         this.updatedCells = [];
         this.traveledCells = [];
 
+        this.asyncPimRunning = false;
+
         this.grid = this.makeGrid();
         if (mode == "pre") this.generatePimMaze();
-
+        if (mode == "async" && !this.asyncPimRunning) this.asyncStartPim(true);
 
     }
 
@@ -37,22 +39,16 @@ class Maze {
     }
 
     update() {
-        switch (mode) {
+        switch (this.mode) {
             case "async":
-                if (asyncPimRunning) {
-                    //Do the calculations for n steps
-                    for (let i = 0; i < this.steps; i++) {
-                        var out = maze.asyncGeneratePimMaze(traveled);
-                        traveled = out[1];
-                        asyncPimRunning = out[0];
-                    }
-                    //Should only be ran once
-                    if (!asyncPimRunning) maze.asyncEndPim();
-
-                    //Only display once every n steps
-                    this.targetedShow();
-                    this.updatedCells.length = 0;
+                //Do the calculations for n steps
+                for (let i = 0; i < this.steps; i++) {
+                    this.asyncGeneratePimMaze();
                 }
+
+                //Only display once every n steps
+                this.targetedShow();
+                this.updatedCells.length = 0;
                 break;
             case "solve-player":
                 this.show();
@@ -67,13 +63,11 @@ class Maze {
     show() {
         for (let i = 0; i < this.columns; i++) {
             for (let j = 0; j < rows; j++) {
-                if (this.isOver(i, j)) {
-                    fill(200);
-                } else {
-                    fill(255);
-                }
-                stroke(0);
                 this.grid[i][j].show();
+                fill(color(80, 180, 255));
+
+                rectMode(CENTER);
+                rect(mouseX, mouseY, 10);
             }
         }
     }
@@ -141,13 +135,22 @@ class Maze {
                 potentialEndPoints.push(cell);
         }
         var randInt = floor(random(0, potentialEndPoints.length));
-        potentialEndPoints[randInt].isEnd = true;
+        try {
+            potentialEndPoints[randInt].isEnd = true;
+        } catch (error) {
+            console.log(potentialEndPoints, cell);
+        }
+
 
         //Set mode to 
         this.mode = "solve-player";
     }
 
-    asyncStartPim() {
+    asyncStartPim(once) {
+        if (!once) return;
+
+        this.asyncPimRunning = true;
+
         //Chose random cell as start
         var startCell = this.grid[floor(random(0, this.columns + .1))][0];
         startCell.isStart = true;
@@ -157,37 +160,42 @@ class Maze {
         this.traveledCells = [startCell];
     }
 
-    asyncGeneratePimMaze(traveledCells) {
+    asyncGeneratePimMaze() {
         var out = true;
 
-        //Get potential cells
-        var potentialCells = this.getPotentialCells(traveledCells);
+        //Gaurd
+        if (this.asyncPimRunning) {
 
-        //Color potential cells
-        for (let i = 0; i < this.columns; i++) {
-            for (let j = 0; j < this.rows; j++) {
-                this.grid[i][j].isPotential = false;
+            //Get potential cells
+            var potentialCells = this.getPotentialCells(this.traveledCells);
+
+            //Color potential cells
+            for (let i = 0; i < this.columns; i++) {
+                for (let j = 0; j < this.rows; j++) {
+                    this.grid[i][j].isPotential = false;
+                }
             }
-        }
-        for (var i = 0; i < potentialCells.length; i++) {
-            var cell = potentialCells[i];
-            cell.isPotential = true;
-            this.updatedCells.push(cell);
-        }
+            for (var i = 0; i < potentialCells.length; i++) {
+                var cell = potentialCells[i];
+                cell.isPotential = true;
+                this.updatedCells.push(cell);
+            }
 
-        if (potentialCells.length > 0) {
-            //Randomly pick potential cell
-            var randInt = floor(random(0, potentialCells.length));
-            var randomCell = potentialCells[randInt]
-            //Add picked cell to traveled cels
-            this.traveledCells.push(randomCell);
-            randomCell.traveled = true;
-            this.updatedCells.push(randomCell);
-        } else {
-            out = false;
-        }
+            if (potentialCells.length > 0) {
+                //Randomly pick potential cell
+                var randInt = floor(random(0, potentialCells.length));
+                var randomCell = potentialCells[randInt]
+                //Add picked cell to traveled cels
+                this.traveledCells.push(randomCell);
+                randomCell.traveled = true;
+                this.updatedCells.push(randomCell);
+            } else {
+                this.asyncEndPim();
+                out = false;
+            }
 
-        return [out, traveledCells];
+            this.asyncPimRunning = out;
+        }
     }
 
     asyncEndPim() {
@@ -198,7 +206,6 @@ class Maze {
             }
         }
         this.generateEndPoint();
-        this.mode = "solve-player";
     }
 
     getPotentialCells() {
@@ -312,6 +319,7 @@ class Cell {
 
     show() {
         noStroke();
+        rectMode(CORNER);
         if (this.isStart) fill(this.startColor);
         else if (this.isEnd) fill(this.endColor);
         else if (this.traveled) fill(this.openColor);
