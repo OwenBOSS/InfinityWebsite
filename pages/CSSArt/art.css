@@ -1,80 +1,112 @@
-body{
-    margin: 0;
+body {
+  margin: 0;
 }
 
-.clock{
-    background: grey;
-    width: 80vmin;
-    height: 80vmin;
-    border-radius: 100%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.clock {
+  background: rgb(202, 171, 255);
+  width: 80vmin;
+  height: 80vmin;
+  border-radius: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.clock #center{
-    background: black;
-    width: 3vmin;
-    height: 3vmin;
+.clock #center {
+  background: hsl(198, 100%, 15%);
+  width: 8vmin;
+  height: 8vmin;
+  z-index: 5;
 }
 
-.tick-container{
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+.tick-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
-.clock-tick{
-    position: absolute;
-    background: black;
-    width: 3vmin;
-    height: 10vmin;
-    top: 50%;
-    left: 50%;
-    border-radius: 10%;
+.clock-tick {
+  position: absolute;
+  background: hsl(198, 100%, 15%);
+  width: 3vmin;
+  height: 10vmin;
+  top: 50%;
+  left: 50%;
+  border-radius: 10%;
 }
 
-#t12{
-    transform: translate(-50%, -50%) translate(0%, -35vmin);
-    width: 5vmin;
-}
-#t6{
-    transform: translate(-50%, -50%) translate(0%, 35vmin);
-    width: 5vmin;
-}
-#t3{
-    transform: translate(-50%, -50%) rotate(90deg) translate(0%, -35vmin);
-    width: 5vmin;
-}
-#t9{
-    transform: translate(-50%, -50%) rotate(90deg) translate(0%, 35vmin);
-    width: 5vmin;
+#t12 {
+  transform: translate(-50%, -50%) translate(0%, -35vmin);
+  width: 5vmin;
 }
 
-#t1{
-    transform: translate(-50%, -50%) rotate(30deg) translate(0%, -35vmin);
+#t6 {
+  transform: translate(-50%, -50%) translate(0%, 35vmin);
+  width: 5vmin;
 }
-#t2{
-    transform: translate(-50%, -50%) rotate(60deg) translate(-50%, -35vmin);
+
+#t3 {
+  transform: translate(-50%, -50%) rotate(90deg) translate(0%, -35vmin);
+  width: 5vmin;
 }
-#t4{
-    transform: translate(-50%, -50%) rotate(120deg) translate(0%, -35vmin);
+
+#t9 {
+  transform: translate(-50%, -50%) rotate(90deg) translate(0%, 35vmin);
+  width: 5vmin;
 }
-#t5{
-    transform: translate(-50%, -50%) rotate(150deg) translate(-50%, -35vmin);
+
+#t1 {
+  transform: translate(-50%, -50%) rotate(30deg) translate(0%, -35vmin);
 }
-#t7{
-    transform: translate(-50%, -50%) rotate(210deg) translate(0%, -35vmin);
+
+#t2 {
+  transform: translate(-50%, -50%) rotate(60deg) translate(-50%, -35vmin);
 }
-#t8{
-    transform: translate(-50%, -50%) rotate(240deg) translate(-50%, -35vmin);
+
+#t4 {
+  transform: translate(-50%, -50%) rotate(120deg) translate(0%, -35vmin);
 }
-#t10{
-    transform: translate(-50%, -50%) rotate(300deg) translate(0%, -35vmin);
+
+#t5 {
+  transform: translate(-50%, -50%) rotate(150deg) translate(-50%, -35vmin);
 }
-#t11{
-    transform: translate(-50%, -50%) rotate(330deg) translate(-50%, -35vmin);
+
+#t7 {
+  transform: translate(-50%, -50%) rotate(210deg) translate(0%, -35vmin);
 }
+
+#t8 {
+  transform: translate(-50%, -50%) rotate(240deg) translate(-50%, -35vmin);
+}
+
+#t10 {
+  transform: translate(-50%, -50%) rotate(300deg) translate(0%, -35vmin);
+}
+
+#t11 {
+  transform: translate(-50%, -50%) rotate(330deg) translate(-50%, -35vmin);
+}
+
+.hours-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.hours {
+  height: 38.4vmin;
+  width: 8vmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #005980;
+  border-radius: 50% 50% 50% 50%/10% 10% 0% 0%;
+  transform-origin: bottom;
+  transform: translate(-50%, -100%) rotate(180deg);
+}/*# sourceMappingURL=art.css.map */
