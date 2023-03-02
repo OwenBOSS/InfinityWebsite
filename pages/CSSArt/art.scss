@@ -31,7 +31,7 @@ body{
 }
 
 .clock #center{
-    background: $clockTickColor;
+    background: $clockCenterColor;
     width: .1 * $clockSize;
     height: 0.1 * $clockSize;
     z-index: 5;
@@ -96,7 +96,7 @@ body{
 
 
 //Clock hands
-.hours-container{
+.hours-container, .mins-container, .seconds-container{
     @include clockElementContainer();
 }
 
@@ -104,9 +104,31 @@ body{
     height: 0.48 * $clockSize;
     width: 0.1 * $clockSize;
     @include center();
-    background: lighten($color: $clockTickColor, $amount: 10);
+    background: $clockHourHandColor;
     border-radius: 50% 50% 50% 50% / 10% 10% 0% 0%;
 
     transform-origin: bottom;
-    transform: translate(-50%, -100%) rotate(180deg);
+    transform: translate(-50%, -100%) rotate(0deg);
+}
+
+.mins{
+    height: 0.48 * $clockSize;
+    width: 0.05 * $clockSize;
+    @include center();
+    background: $clockMinuteHandColor;
+    border-radius: 50% 50% 50% 50% / 10% 10% 0% 0%;
+
+    transform-origin: bottom;
+    transform: translate(-50%, -100%) rotate(0deg);
+}
+
+.seconds{
+    height: 0.48 * $clockSize;
+    width: 0.02 * $clockSize;
+    @include center();
+    background: $clockSecondHandColor;
+    border-radius: 50% 50% 50% 50% / 5% 5% 0% 0%;
+
+    transform-origin: bottom;
+    transform: translate(-50%, -100%) rotate(0deg);
 }

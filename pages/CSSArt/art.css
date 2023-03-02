@@ -3,7 +3,7 @@ body {
 }
 
 .clock {
-  background: rgb(202, 171, 255);
+  background: #4d455d;
   width: 80vmin;
   height: 80vmin;
   border-radius: 100%;
@@ -14,7 +14,7 @@ body {
 }
 
 .clock #center {
-  background: hsl(198, 100%, 15%);
+  background: #7db9b6;
   width: 8vmin;
   height: 8vmin;
   z-index: 5;
@@ -30,7 +30,7 @@ body {
 
 .clock-tick {
   position: absolute;
-  background: hsl(198, 100%, 15%);
+  background: #e96479;
   width: 3vmin;
   height: 10vmin;
   top: 50%;
@@ -90,7 +90,7 @@ body {
   transform: translate(-50%, -50%) rotate(330deg) translate(-50%, -35vmin);
 }
 
-.hours-container {
+.hours-container, .mins-container, .seconds-container {
   position: absolute;
   top: 0;
   right: 0;
@@ -105,8 +105,34 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #005980;
+  background: #f5e9cf;
   border-radius: 50% 50% 50% 50%/10% 10% 0% 0%;
   transform-origin: bottom;
-  transform: translate(-50%, -100%) rotate(180deg);
+  transform: translate(-50%, -100%) rotate(0deg);
+}
+
+.mins {
+  height: 38.4vmin;
+  width: 4vmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #f5e9cf;
+  border-radius: 50% 50% 50% 50%/10% 10% 0% 0%;
+  transform-origin: bottom;
+  transform: translate(-50%, -100%) rotate(0deg);
+}
+
+.seconds {
+  height: 38.4vmin;
+  width: 1.6vmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #f5e9cf;
+  border-radius: 50% 50% 50% 50%/5% 5% 0% 0%;
+  transform-origin: bottom;
+  transform: translate(-50%, -100%) rotate(0deg);
 }/*# sourceMappingURL=art.css.map */
